@@ -5,4 +5,4 @@ This project is the simple implementation of value-based rl algorithms (includin
   2. Double DQN
 
 ## Environment
-1. MinAtar
+1. [MinAtar](https://github.com/kenjyoung/MinAtar)
