@@ -11,4 +11,4 @@ This project is the simple implementation of value-based rl algorithms (includin
   8. [Ensemble Bootstrapped DQN](https://arxiv.org/pdf/2103.00445.pdf)
 
 ## Environment
-  1. MinAtar, which includes 5 different games of Atari 2600, is a miniaturized environment. [Github](https://github.com/kenjyoung/MinAtar) [Paper](https://arxiv.org/pdf/1903.03176)
+  1. MinAtar is a miniaturized environment which includes 5 different games of Atari 2600 (asterix, breakout, freeway, seaquest, space_invaders). [[Github](https://github.com/kenjyoung/MinAtar)] [[Paper](https://arxiv.org/pdf/1903.03176)]
