@@ -14,6 +14,8 @@ This project is the simple implementation of Q-Learning based methods
     
    1.3. [Averaged DQN, Ensemble DQN](https://arxiv.org/pdf/1611.01929.pdf)
 
+   1.4  [Ensemble Bootstrapping DQN](https://arxiv.org/pdf/2103.00445.pdf)
+
 2. For improving exploration ability
   
    2.1. [Bootstrapped DQN](https://arxiv.org/pdf/1602.04621.pdf)
@@ -22,7 +24,6 @@ This project is the simple implementation of Q-Learning based methods
     
    2.3. [Ensemble Voting DQN, UCB Exploration with Q-Ensembles](https://arxiv.org/pdf/1706.01502.pdf)
     
-   2.4. [Ensemble Bootstrapped DQN](https://arxiv.org/pdf/2103.00445.pdf)
 
 ## Environment
 
