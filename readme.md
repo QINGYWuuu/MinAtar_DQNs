@@ -1,5 +1,5 @@
-This project is the simple implementation of Q-Learning based methods
-
+This project is the simple pytorch-based implementation of Q-Learning based methods
+The code is the modification of the official implementation of [MinAtar](https://github.com/kenjyoung/MinAtar).
 ## Methods
 
 0. Basic Implementation 
