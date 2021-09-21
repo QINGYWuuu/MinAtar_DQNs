@@ -134,6 +134,8 @@ def DQN(env, save_path, writer, eval_env):
         episode += 1
         avg_return = 0.99 * avg_return + 0.01 * score
 
+
+# fixed parameters
 BATCH_SIZE = 32
 REPLAY_BUFFER_SIZE = 100000
 TARGET_NETWORK_UPDATE_FREQ = 1000
@@ -148,11 +150,14 @@ SQUARED_GRAD_MOMENTUM = 0.95
 MIN_SQUARED_GRAD = 0.01
 GAMMA = 0.99
 EPSILON = 1.0
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-device = torch.device("cpu")
+EVAL_TIMES = 10
 GAMES = ['asterix', 'breakout', 'freeway', 'seaquest', 'space_invaders']
 RANDOM_SEEDS = range(5)
-EVAL_TIMES = 10
+
+# specific device
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 if __name__ == '__main__':
     for game in GAMES:
         random_seeds = [0]
