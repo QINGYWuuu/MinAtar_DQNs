@@ -28,3 +28,16 @@ This project is the simple implementation of Q-Learning based methods
 ## Environment
 
    1. [MinAtar](https://github.com/kenjyoung/MinAtar) is a miniaturized environment which includes 5 games of Atari 2600 (asterix, breakout, freeway, seaquest, space_invaders). [[Paper](https://arxiv.org/pdf/1903.03176)]
+
+## citation
+
+```
+@misc{SimpleImplementation,
+author = {Qingyuan, WU},
+title = {A simple implementation of Q-learning based RL methods},
+year = {2021},
+publisher = {GitHub},
+journal = {GitHub Repository},
+howpublished = {\url{https://github.com/qlan3/Explorer}}
+}
+```
