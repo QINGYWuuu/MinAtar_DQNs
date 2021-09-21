@@ -27,4 +27,4 @@ This project is the simple implementation of Q-Learning based methods
 
 ## Environment
 
-   1. MinAtar is a miniaturized environment which includes 5 different games of Atari 2600 (asterix, breakout, freeway, seaquest, space_invaders). [[Github](https://github.com/kenjyoung/MinAtar)] [[Paper](https://arxiv.org/pdf/1903.03176)]
+   1. [MinAtar](https://github.com/kenjyoung/MinAtar) is a miniaturized environment which includes 5 games of Atari 2600 (asterix, breakout, freeway, seaquest, space_invaders). [[Paper](https://arxiv.org/pdf/1903.03176)]
