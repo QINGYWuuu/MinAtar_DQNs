@@ -89,7 +89,7 @@ def Double_DQN(env, save_path, writer, eval_env):
 
     step = 0
     episode = 0
-    policy_net_update_counter = 0
+    current_net_update_counter = 0
     while step < NUM_FRAMES:
         score = 0.0
         env.reset()
@@ -103,9 +103,9 @@ def Double_DQN(env, save_path, writer, eval_env):
             if step > REPLAY_START_SIZE and len(replay_buffer.buffer) >= BATCH_SIZE:
                 sample = replay_buffer.sample(BATCH_SIZE)
             if step % TRAINING_FREQ == 0 and sample is not None:
-                policy_net_update_counter += 1
+                current_net_update_counter += 1
                 Q_values = train(sample, current_net, target_net, optimizer)
-            if policy_net_update_counter > 0 and policy_net_update_counter % TARGET_NETWORK_UPDATE_FREQ == 0:
+            if current_net_update_counter > 0 and current_net_update_counter % TARGET_NETWORK_UPDATE_FREQ == 0:
                 target_net.load_state_dict(current_net.state_dict())
 
             score += reward.item()

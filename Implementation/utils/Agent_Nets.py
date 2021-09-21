@@ -28,3 +28,17 @@ class Q_ConvNet(nn.Module):
         x = F.relu(self.conv(x))
         x = F.relu(self.fc_hidden(x.view(x.size(0), -1)))
         return self.output(x)
+
+class Multi_head_Q_ConvNet(nn.Module):
+    def __init__(self, in_channels, num_actions, head_num):
+        super(Multi_head_Q_ConvNet, self).__init__()
+        self.conv = nn.Conv2d(in_channels, 16, kernel_size=3, stride=1)
+        def size_linear_unit(size, kernel_size=3, stride=1):
+            return (size - (kernel_size - 1) - 1) // stride + 1
+        num_linear_units = size_linear_unit(10) * size_linear_unit(10) * 16
+        self.fc_hidden = nn.Linear(in_features=num_linear_units, out_features=128)
+        self.output = nn.Linear(in_features=128, out_features=num_actions)
+    def forward(self, x):
+        x = F.relu(self.conv(x))
+        x = F.relu(self.fc_hidden(x.view(x.size(0), -1)))
+        return self.output(x)

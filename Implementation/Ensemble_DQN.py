@@ -15,7 +15,7 @@ transition = namedtuple('transition', 'state, action, reward, next_state, done')
 def get_state(s):
     return (torch.tensor(s, device=device).permute(2, 0, 1)).unsqueeze(0).float()
 
-def act_env(step, act_dim, state, env, current_net):
+def act_env(step, act_dim, state, env, Net_Ensemble):
     if step < REPLAY_START_SIZE:
         action = torch.tensor([[random.randrange(act_dim)]], device=device)
     else:
@@ -27,20 +27,33 @@ def act_env(step, act_dim, state, env, current_net):
             action = torch.tensor([[random.randrange(act_dim)]], device=device)
         else:
             with torch.no_grad():
-                action = current_net(state).max(1)[1].view(1, 1)
+                for net_id in range(ENSEMBLE_SIZE):
+                    if net_id == 0:
+                        ensemble_net_value = Net_Ensemble[net_id](state)
+                    else:
+                        ensemble_net_value += Net_Ensemble[net_id](state)
+                ensemble_net_value /= ENSEMBLE_SIZE
+                action = ensemble_net_value.max(1)[1].view(1, 1)
+
     reward, done = env.act(action)
     next_state = get_state(env.state())
     return next_state, action, torch.tensor([[reward]], device=device).float(), torch.tensor([[done]], device=device)
 
-def act_env_eval(state, env_eval, current_net):
+def act_env_eval(state, env_eval, Net_Ensemble):
     with torch.no_grad():
-        action = current_net(state).max(1)[1].view(1, 1)
+        for net_id in range(ENSEMBLE_SIZE):
+            if net_id == 0:
+                ensemble_net_value = Net_Ensemble[net_id](state)
+            else:
+                ensemble_net_value += Net_Ensemble[net_id](state)
+        ensemble_net_value /= ENSEMBLE_SIZE
+        action = ensemble_net_value.max(1)[1].view(1, 1)
     reward, done = env_eval.act(action)
     next_state = get_state(env_eval.state())
     return next_state, action, torch.tensor([[reward]], device=device).float(), torch.tensor([[done]], device=device)
 
 
-def train(sample, current_net, target_net, optimizer):
+def train(sample, Net_Ensemble, Optim_Ensemble):
 
     batch_samples = transition(*zip(*sample))
     states = torch.cat(batch_samples.state)
@@ -49,37 +62,43 @@ def train(sample, current_net, target_net, optimizer):
     rewards = torch.cat(batch_samples.reward)
     dones = torch.cat(batch_samples.done)
 
-    Q_s_a = current_net(states).gather(1, actions)
     none_done_next_state_index = torch.tensor([i for i, is_term in enumerate(dones) if is_term == 0], dtype=torch.int64, device=device)
     none_done_next_states = next_states.index_select(0, none_done_next_state_index)
     Q_s_prime_a_prime = torch.zeros(len(sample), 1, device=device)
 
     if len(none_done_next_states) != 0:
-        Q_s_prime_a_prime[none_done_next_state_index] = target_net(none_done_next_states).detach().max(1)[0].unsqueeze(1)
+        for net_id in range(ENSEMBLE_SIZE):
+            Q_s_prime_a_prime[none_done_next_state_index] += Net_Ensemble[net_id](none_done_next_states)
+        Q_s_prime_a_prime /= ENSEMBLE_SIZE
+        Q_s_prime_a_prime = Q_s_prime_a_prime.detach().max(1)[0].unsqueeze(1)
     learning_target = rewards + GAMMA * Q_s_prime_a_prime
 
-    loss = f.smooth_l1_loss(learning_target, Q_s_a)
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-    return Q_s_a.mean().detach().cpu().numpy()
+    Q_values = 0
+    for net_id in range(ENSEMBLE_SIZE):
+        Q_s_a = Net_Ensemble[net_id](states).gather(1, actions)
+        loss = f.smooth_l1_loss(learning_target, Q_s_a)
+        Optim_Ensemble[net_id].zero_grad()
+        loss.backward()
+        Optim_Ensemble[net_id].step()
+        Q_values += Q_s_a.mean().detach().cpu().numpy()
+    return Q_values
 
 
 
-def DQN(env, save_path, writer, eval_env):
+def Ensemble_DQN(env, save_path, writer, eval_env):
 
     obs_dim = env.state_shape()[2]
     act_dim = env.num_actions()
 
-    current_net = Q_ConvNet(obs_dim, act_dim).to(device)
-    target_net = Q_ConvNet(obs_dim, act_dim).to(device)
-    target_net.load_state_dict(current_net.state_dict())
-
-    optimizer = optim.RMSprop(current_net.parameters(),
-                              lr=LEARNING_RATE,
-                              alpha=SQUARED_GRAD_MOMENTUM,
-                              centered=True,
-                              eps=MIN_SQUARED_GRAD)
+    Net_Ensemble = []
+    Optim_Ensemble = []
+    for net_id in range(ENSEMBLE_SIZE):
+        Net_Ensemble.append(Q_ConvNet(obs_dim, act_dim).to(device))
+        Optim_Ensemble.append(optim.RMSprop(Net_Ensemble[net_id].parameters(),
+                                            lr=LEARNING_RATE,
+                                            alpha=SQUARED_GRAD_MOMENTUM,
+                                            centered=True,
+                                            eps=MIN_SQUARED_GRAD))
 
     replay_buffer = tuple_replay_buffer(REPLAY_BUFFER_SIZE)
 
@@ -88,24 +107,23 @@ def DQN(env, save_path, writer, eval_env):
 
     step = 0
     episode = 0
-    current_net_update_counter = 0
+    net_ensemble_update_counter = 0
+
     while step < NUM_FRAMES:
         score = 0.0
         env.reset()
         state = get_state(env.state())
         done = False
         while(not done) and step < NUM_FRAMES:
-            next_state, action, reward, done = act_env(step, act_dim, state, env, current_net)
+            next_state, action, reward, done = act_env(step, act_dim, state, env, Net_Ensemble)
             replay_buffer.add(state, action, reward, next_state, done)
 
             sample = None
             if step > REPLAY_START_SIZE and len(replay_buffer.buffer) >= BATCH_SIZE:
                 sample = replay_buffer.sample(BATCH_SIZE)
             if step % TRAINING_FREQ == 0 and sample is not None:
-                current_net_update_counter += 1
-                Q_values = train(sample, current_net, target_net, optimizer)
-            if current_net_update_counter > 0 and current_net_update_counter % TARGET_NETWORK_UPDATE_FREQ == 0:
-                target_net.load_state_dict(current_net.state_dict())
+                net_ensemble_update_counter += 1
+                Q_values = train(sample, Net_Ensemble, Optim_Ensemble)
 
             score += reward.item()
             step += 1
@@ -121,16 +139,20 @@ def DQN(env, save_path, writer, eval_env):
                     state = get_state(env.state())
                     done = False
                     while (not done):
-                        next_state, action, reward, done = act_env_eval(state, eval_env, current_net)
+                        next_state, action, reward, done = act_env_eval(state, eval_env, Net_Ensemble)
                         eval_score += reward.item()
                         state = next_state
                     eval_scores.append(eval_score)
                 writer.add_scalar("EVALUATION/RETURN", np.mean(eval_scores), global_step=step)
                 print("Evaluation: step={},score={}".format(step, np.mean(eval_scores)))
-                torch.save(current_net.state_dict(), save_path+"{}_steps_checkpoint.pkl".format(step))
+                for net_id in range(ENSEMBLE_SIZE):
+                    torch.save(Net_Ensemble[net_id].state_dict(),
+                               save_path+"{}_Net_{}_steps_checkpoint.pkl".format(net_id, step))
                 if np.mean(eval_scores) > best_eval_score:
                     best_eval_score = np.mean(eval_scores)
-                    torch.save(current_net.state_dict(), save_path + "best_checkpoint.pkl")
+                    for net_id in range(ENSEMBLE_SIZE):
+                        torch.save(Net_Ensemble[net_id].state_dict(),
+                                   save_path + "{}_Net_best_checkpoint.pkl".format(net_id))
         episode += 1
         avg_return = 0.99 * avg_return + 0.01 * score
 
@@ -158,11 +180,13 @@ RANDOM_SEEDS = range(5)
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+ENSEMBLE_SIZE = 5
+
 if __name__ == '__main__':
     for game in GAMES:
         random_seeds = [0]
         for seed in random_seeds:
-            save_path = os.getcwd() + '/RESULTS/DQN/Env={},Seed={}/'.format(game, seed)
+            save_path = os.getcwd() + '/RESULTS/Ensemble_DQN,Ensemble_Size={}/Env={},Seed={}/'.format(ENSEMBLE_SIZE, game, seed)
             writer = SummaryWriter(save_path)
             env = Environment(game)
             eval_env = Environment(game)
@@ -172,5 +196,5 @@ if __name__ == '__main__':
             if torch.backends.cudnn.enabled:
                 torch.backends.cudnn.benchmark = False
                 torch.backends.cudnn.deterministic = True
-            DQN(env, save_path, writer, eval_env)
+            Ensemble_DQN(env, save_path, writer, eval_env)
             writer.close()
