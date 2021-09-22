@@ -38,6 +38,6 @@ title = {A simple implementation of Q-learning based RL methods},
 year = {2021},
 publisher = {GitHub},
 journal = {GitHub Repository},
-howpublished = {\url{https://github.com/qlan3/Explorer}}
+howpublished = {\url{https://github.com/QINGYWuuu/The-Simple-Implementation-of-Q-Learning-Based-RL}}
 }
 ```
