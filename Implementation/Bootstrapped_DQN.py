@@ -61,9 +61,10 @@ def train(sample, Net_Ensemble, Optim_Ensemble, Target_Ensemble):
     for net_id in range(ENSEMBLE_SIZE):
         Q_s_a = Net_Ensemble[net_id](states).gather(1, actions)
 
-        Q_s_prime_a_prime = torch.zeros(len(sample), 1, device=device)
-        if len(none_done_next_states) != 0:
-            Q_s_prime_a_prime[none_done_next_state_index] = Target_Ensemble[net_id](none_done_next_states).detach().max(1)[0].unsqueeze(1)
+        with torch.no_grad():
+            Q_s_prime_a_prime = torch.zeros(len(sample), 1, device=device)
+            if len(none_done_next_states) != 0:
+                Q_s_prime_a_prime[none_done_next_state_index] = Target_Ensemble[net_id](none_done_next_states).detach().max(1)[0].unsqueeze(1)
         learning_target = rewards + GAMMA * Q_s_prime_a_prime
 
         loss = f.smooth_l1_loss(learning_target, Q_s_a)
