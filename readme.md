@@ -30,9 +30,9 @@ todo
 ## citation
 
 ```
-@misc{SimpleImplementation,
+@misc{NEMO-RL,
 author = {Qingyuan, WU},
-title = {A simple implementation of Q-learning based RL methods},
+title = {A pytorch implementation of DQN-based RL methods for MinAtar},
 year = {2021},
 publisher = {GitHub},
 journal = {GitHub Repository},
