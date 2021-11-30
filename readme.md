@@ -18,7 +18,7 @@ This project is the pytorch-based implementation of DQN-based methods for MinAta
 13. [x] [Ensemble Voting DQN, UCB Exploration with Q-Ensembles](https://arxiv.org/pdf/1706.01502.pdf)
 14. [x] [Sunrise DQN](https://arxiv.org/pdf/2007.04938.pdf)
 
-## Implementation Details
+## Implementation Structure
 ![DQN_Agent Structrue](pics/structure.png#pic_left)
     
 
