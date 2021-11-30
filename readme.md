@@ -1,4 +1,4 @@
-This project is the simple pytorch-based implementation of DQN-based methods for MinAtar.
+This project is the pytorch-based implementation of DQN-based methods for MinAtar.
 
 ## Methods
 
@@ -32,7 +32,7 @@ todo
 ```
 @misc{NEMO-RL,
 author = {Qingyuan, WU},
-title = {A pytorch implementation of DQN-based RL methods for MinAtar},
+title = {A pytorch-based implementation of DQN-based RL methods for MinAtar},
 year = {2021},
 publisher = {GitHub},
 journal = {GitHub Repository},
