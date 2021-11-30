@@ -1,5 +1,5 @@
-This project is the simple pytorch-based implementation of DQN-based methods.
-The code is the modification of the official implementation of [MinAtar](https://github.com/kenjyoung/MinAtar).
+This project is the simple pytorch-based implementation of DQN-based methods for MinAtar.
+
 ## Methods
 
 
