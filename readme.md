@@ -23,6 +23,10 @@ The code is the modification of the official implementation of [MinAtar](https:/
 
    1. [MinAtar](https://github.com/kenjyoung/MinAtar) is a miniaturized environment which includes 5 games of Atari 2600 (asterix, breakout, freeway, seaquest, space_invaders). [[Paper](https://arxiv.org/pdf/1903.03176)]
 
+## Results
+
+todo
+
 ## citation
 
 ```
