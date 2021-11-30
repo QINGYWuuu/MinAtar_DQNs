@@ -31,7 +31,7 @@ This project is the pytorch-based implementation of DQN-based methods for MinAta
 
 todo
 
-## citation
+## Citation
 
 ```
 @misc{NEMO-RL,
