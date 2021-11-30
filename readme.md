@@ -1,6 +1,6 @@
 This project is the pytorch-based implementation of DQN-based methods for MinAtar.
 
-## Methods
+## Implemented Methods
 
 
 1. [x] [DQN](http://www.nature.com/articles/nature14236)
@@ -17,11 +17,15 @@ This project is the pytorch-based implementation of DQN-based methods for MinAta
 12. [x] [Bootstrapped DQN](https://arxiv.org/pdf/1602.04621.pdf)
 13. [x] [Ensemble Voting DQN, UCB Exploration with Q-Ensembles](https://arxiv.org/pdf/1706.01502.pdf)
 14. [x] [Sunrise DQN](https://arxiv.org/pdf/2007.04938.pdf)
+
+## Implementation Details
+![DQN_Agent Structrue](pics/structure.png#pic_left)
     
+
 
 ## Environment
 
-   1. [MinAtar](https://github.com/kenjyoung/MinAtar) is a miniaturized environment which includes 5 games of Atari 2600 (asterix, breakout, freeway, seaquest, space_invaders). [[Paper](https://arxiv.org/pdf/1903.03176)]
+[MinAtar](https://github.com/kenjyoung/MinAtar) is a miniaturized environment which includes 5 games of Atari 2600 (asterix, breakout, freeway, seaquest, space_invaders). [[Paper](https://arxiv.org/pdf/1903.03176)]
 
 ## Results
 
