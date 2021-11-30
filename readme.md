@@ -2,27 +2,21 @@ This project is the simple pytorch-based implementation of DQN-based methods.
 The code is the modification of the official implementation of [MinAtar](https://github.com/kenjyoung/MinAtar).
 ## Methods
 
-0. Basic Implementation 
-   
-   0.1 [DQN](http://www.nature.com/articles/nature14236)
-  
-1. For reducing estimation bias
 
-   1.1. [Double DQN](https://arxiv.org/pdf/1509.06461.pdf)
-
-   1.2. [Averaged DQN, Ensemble DQN](https://arxiv.org/pdf/1611.01929.pdf)
-    
-   1.3. [Maxmin DQN](https://arxiv.org/pdf/2002.06487.pdf)
-    
-   1.4  [Ensemble Bootstrapping DQN](https://arxiv.org/pdf/2103.00445.pdf)
-
-2. For improving exploration ability
-  
-   2.1. [Bootstrapped DQN](https://arxiv.org/pdf/1602.04621.pdf)
-    
-   2.2. [Ensemble Voting DQN, UCB Exploration with Q-Ensembles](https://arxiv.org/pdf/1706.01502.pdf)
-   
-   2.3. [Sunrise DQN](https://arxiv.org/pdf/2007.04938.pdf)
+1. [x] [DQN](http://www.nature.com/articles/nature14236)
+2. [x] [Double DQN](https://arxiv.org/pdf/1509.06461.pdf)
+3. [x] [Dueling DQN](http://arxiv.org/abs/1511.06581)
+4. [x] [Noisy DQN](https://arxiv.org/abs/1706.10295)
+5. [x] [Multi-step DQN](http://www.incompleteideas.net/sutton/book/ebook/the-book.html)
+6. [x] [Piorized Experience Replay](http://arxiv.org/abs/1511.05952)
+7. [x] [Distributional DQN](https://arxiv.org/abs/1707.06887)
+8. [x] [Rainbow](https://arxiv.org/pdf/1710.02298.pdf)
+9. [x] [Averaged DQN, Ensemble DQN](https://arxiv.org/pdf/1611.01929.pdf) 
+10. [x] [Maxmin DQN](https://arxiv.org/pdf/2002.06487.pdf)
+11. [x] [Ensemble Bootstrapping DQN](https://arxiv.org/pdf/2103.00445.pdf)
+12. [x] [Bootstrapped DQN](https://arxiv.org/pdf/1602.04621.pdf)
+13. [x] [Ensemble Voting DQN, UCB Exploration with Q-Ensembles](https://arxiv.org/pdf/1706.01502.pdf)
+14. [x] [Sunrise DQN](https://arxiv.org/pdf/2007.04938.pdf)
     
 
 ## Environment
