@@ -1,7 +1,7 @@
 import numpy as np
 from collections import namedtuple
 import random
-from segement_tree import SumSegmentTree, MinSegmentTree
+from utils.segement_tree import SumSegmentTree, MinSegmentTree
 import torch
 
 # normal replay buffer (s, a, r, s', d)
@@ -17,7 +17,7 @@ class replay_buffer:
         self.next_states = torch.zeros((buffer_size,) + tuple(state_dim), device=args.device)
         self.dones = torch.zeros((buffer_size,) + (1, 1), device=args.device).bool()
 
-    def add(self, state, action, reward, next_state, done):
+    def store(self, state, action, reward, next_state, done):
         assert self.buffer_len <= self.buffer_size
         self.states[self.location] = state
         self.actions[self.location] = action
@@ -61,7 +61,7 @@ class prioritized_replay_buffer:
         self.sum_tree = SumSegmentTree(tree_capacity)
         self.min_tree = MinSegmentTree(tree_capacity)
 
-    def add(self, state, action, reward, next_state, done):
+    def store(self, state, action, reward, next_state, done):
         assert self.buffer_len <= self.buffer_size
         self.states[self.location] = state
         self.actions[self.location] = action

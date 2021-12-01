@@ -16,7 +16,7 @@ from run_evaluation import Eval_after_Train
 
 transition = namedtuple('transition', 'state, action, reward, next_state, done')
 parser = argparse.ArgumentParser(description='MinAtar')
-parser.add_argument('--id', type=str, default='PER', help='Experiment ID')
+parser.add_argument('--id', type=str, default='Rainbow', help='Experiment ID')
 parser.add_argument('--seed', type=int, default=4, help='Random seed')
 parser.add_argument('--game', type=str, default='asterix', help='Game')
 parser.add_argument('--use-cuda', type=bool, default=True, help='Disable CUDA')
@@ -33,11 +33,11 @@ parser.add_argument('--grad-momentum', type=float, default=0.95, metavar='η', h
 parser.add_argument('--squared-grad-momentum', type=float, default=0.95, metavar='η', help='Adam')
 parser.add_argument('--min-squared-grad', type=float, default=0.01, metavar='η', help='Adam')
 parser.add_argument('--gamma', type=float, default=0.99, metavar='γ', help='Discount factor')
-parser.add_argument('--dueling', type=bool, default=False, help='Dueling Network Architecture')
-parser.add_argument('--double', type=bool, default=False, help='Double DQN')
+parser.add_argument('--dueling', type=bool, default=True, help='Dueling Network Architecture')
+parser.add_argument('--double', type=bool, default=True, help='Double DQN')
 parser.add_argument('--n-step', type=int, default=3, help='Multi-step DQN')
-parser.add_argument('--distributional', type=bool, default=False, help='Distributional DQN')
-parser.add_argument('--noisy', type=bool, default=False, help='Noisy DQN')
+parser.add_argument('--distributional', type=bool, default=True, help='Distributional DQN')
+parser.add_argument('--noisy', type=bool, default=True, help='Noisy DQN')
 parser.add_argument('--per', type=bool, default=True, help='Periorized Experience Replay')
 
 class DQN_Agent():
@@ -107,7 +107,7 @@ class DQN_Agent():
                 n_step_reward_deque.append(reward)
                 n_step_done_deque.append(done)
                 if len(n_step_state_deque) == self.args.n_step+1:
-                    self.memory.add(n_step_state_deque[0].to(self.args.device),
+                    self.memory.store(n_step_state_deque[0].to(self.args.device),
                                     action[0].unsqueeze(dim=0).to(self.args.device),
                                     torch.tensor([[np.sum(np.array(n_step_reward_deque)*np.array(n_step_gamma_vector))]]).to(self.args.device),
                                     n_step_state_deque[-1].to(self.args.device),
