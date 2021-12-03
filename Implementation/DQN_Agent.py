@@ -17,7 +17,7 @@ from run_evaluation import Eval_after_Train
 transition = namedtuple('transition', 'state, action, reward, next_state, done')
 parser = argparse.ArgumentParser(description='MinAtar')
 parser.add_argument('--id', type=str, default='Rainbow', help='Experiment ID')
-parser.add_argument('--seed', type=int, default=4, help='Random seed')
+parser.add_argument('--seed', type=int, default=0, help='Random seed')
 parser.add_argument('--game', type=str, default='asterix', help='Game')
 parser.add_argument('--use-cuda', type=bool, default=True, help='Disable CUDA')
 parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
@@ -33,8 +33,9 @@ parser.add_argument('--grad-momentum', type=float, default=0.95, metavar='η', h
 parser.add_argument('--squared-grad-momentum', type=float, default=0.95, metavar='η', help='Adam')
 parser.add_argument('--min-squared-grad', type=float, default=0.01, metavar='η', help='Adam')
 parser.add_argument('--gamma', type=float, default=0.99, metavar='γ', help='Discount factor')
-parser.add_argument('--dueling', type=bool, default=True, help='Dueling Network Architecture')
+
 parser.add_argument('--double', type=bool, default=True, help='Double DQN')
+parser.add_argument('--dueling', type=bool, default=True, help='Dueling Network Architecture')
 parser.add_argument('--n-step', type=int, default=3, help='Multi-step DQN')
 parser.add_argument('--distributional', type=bool, default=True, help='Distributional DQN')
 parser.add_argument('--noisy', type=bool, default=True, help='Noisy DQN')
@@ -69,8 +70,24 @@ class DQN_Agent():
         self.act_env = Environment(args.game)
         self.obs_dim = self.act_env.state_shape()[2]
         self.act_dim = self.act_env.num_actions()
-        self.QValue_Net = Q_ConvNet(self.obs_dim, self.act_dim, args.dueling).to(args.device)
-        self.Target_Net = Q_ConvNet(self.obs_dim, self.act_dim, args.dueling).to(args.device)
+        self.QValue_Net = Q_ConvNet(in_channels=self.obs_dim,
+                            num_actions=self.act_dim,
+                            dueling=args.dueling,
+                            noisy=args.noisy,
+                            distributional=args.distributional,
+                            atom_size=51,
+                            v_min=-10.0,
+                            v_max=10.0).to(args.device)
+
+        self.Target_Net = Q_ConvNet(in_channels=self.obs_dim,
+                            num_actions=self.act_dim,
+                            dueling=args.dueling,
+                            noisy=args.noisy,
+                            distributional=args.distributional,
+                            atom_size=51,
+                            v_min=-10.0,
+                            v_max=10.0).to(args.device)
+
         self.Target_Net.load_state_dict(self.QValue_Net.state_dict())
         self.Target_Net.eval()
         self.Optimizer = optim.RMSprop(self.QValue_Net.parameters(), lr=args.learning_rate, alpha=args.squared_grad_momentum, centered=True, eps=args.min_squared_grad)
