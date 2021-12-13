@@ -28,7 +28,7 @@ This project is the pytorch-based implementation of DQN-based methods for MinAta
 [MinAtar](https://github.com/kenjyoung/MinAtar) is a miniaturized environment which includes 5 games of Atari 2600 (asterix, breakout, freeway, seaquest, space_invaders). [[Paper](https://arxiv.org/pdf/1903.03176)]
 
 ## Results
-
+![Asterix](pics/asterix.png#pic_left)
 todo
 
 ## Citation
