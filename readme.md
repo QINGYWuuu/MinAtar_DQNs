@@ -34,7 +34,7 @@ todo
 ## Citation
 
 ```
-@misc{NEMO-RL,
+@misc{MinAtar-torch-dqns,
 author = {Qingyuan, WU},
 title = {A pytorch-based implementation of DQN-based RL methods for MinAtar},
 year = {2021},
