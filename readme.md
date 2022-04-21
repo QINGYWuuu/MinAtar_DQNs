@@ -3,7 +3,7 @@ This project is the pytorch-based implementation of DQN-based methods for MinAta
 ## Implemented Methods
 
 
-### Rainbow style
+### Rainbow
 1. [x] [DQN](http://www.nature.com/articles/nature14236)
 2. [x] [Double DQN](https://arxiv.org/pdf/1509.06461.pdf)
 3. [x] [Dueling DQN](http://arxiv.org/abs/1511.06581)
@@ -12,7 +12,7 @@ This project is the pytorch-based implementation of DQN-based methods for MinAta
 6. [x] [Piorized Experience Replay](http://arxiv.org/abs/1511.05952)
 7. [x] [Distributional DQN](https://arxiv.org/abs/1707.06887)
 8. [x] [Rainbow](https://arxiv.org/pdf/1710.02298.pdf)
-### Ensemble style (Multi-head network)
+### Ensemble DQN (in Multi-head Network style)
 9. [x] [Averaged DQN, Ensemble DQN](https://arxiv.org/pdf/1611.01929.pdf) 
 10. [x] [Maxmin DQN](https://arxiv.org/pdf/2002.06487.pdf)
 11. [x] [Ensemble Bootstrapping DQN](https://arxiv.org/pdf/2103.00445.pdf)
