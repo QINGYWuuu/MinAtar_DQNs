@@ -14,21 +14,21 @@ class Q_ConvNet(nn.Module):
         self.noisy = noisy
         self.distributional = distributional
         self.atom_size = atom_size
-        self.support = torch.linspace(v_min, v_max, atom_size).to("cpu")
+        self.support = torch.linspace(v_min, v_max, atom_size).to("cuda")
 
         def size_linear_unit(size, kernel_size=3, stride=1):
             return (size - (kernel_size - 1) - 1) // stride + 1
         num_linear_units = size_linear_unit(10) * size_linear_unit(10) * 16
 
+        self.fc_hidden = nn.Linear(in_features=num_linear_units, out_features=128)
+
         if self.dueling == False:
             if self.noisy == False:
-                self.fc_hidden = nn.Linear(in_features=num_linear_units, out_features=128)
                 if self.distributional == False:
                     self.output = nn.Linear(in_features=128, out_features=num_actions)
                 else:
                     self.output = nn.Linear(in_features=128, out_features=num_actions * self.atom_size)
             else:
-                self.fc_hidden = NoisyLinear(in_features=num_linear_units, out_features=128)
                 if self.distributional == False:
                     self.output = NoisyLinear(in_features=128, out_features=num_actions)
                 else:
@@ -36,19 +36,14 @@ class Q_ConvNet(nn.Module):
 
         else:
             if self.noisy == False:
-                self.value_fc_hidden = nn.Linear(in_features=num_linear_units, out_features=128)
                 self.value_output = nn.Linear(in_features=128, out_features=1)
-                self.advantage_fc_hidden = nn.Linear(in_features=num_linear_units, out_features=128)
                 if self.distributional == False:
                     self.advantage_output = nn.Linear(in_features=128, out_features=num_actions)
                 else:
                     self.advantage_output = nn.Linear(in_features=128, out_features=num_actions * self.atom_size)
 
             else:
-                self.value_fc_hidden = NoisyLinear(in_features=num_linear_units, out_features=128)
                 self.value_output = NoisyLinear(in_features=128, out_features=1)
-                self.advantage_fc_hidden = NoisyLinear(in_features=num_linear_units, out_features=128)
-                self.advantage_output = NoisyLinear(in_features=128, out_features=num_actions)
                 if self.distributional == False:
                     self.advantage_output = NoisyLinear(in_features=128, out_features=num_actions)
                 else:
@@ -56,9 +51,10 @@ class Q_ConvNet(nn.Module):
 
 
     def forward(self, x):
+        x = F.relu(self.conv(x))
+        x = F.relu(self.fc_hidden(x.view(x.size(0), -1)))
+
         if self.dueling == False:
-            x = F.relu(self.conv(x))
-            x = F.relu(self.fc_hidden(x.view(x.size(0), -1)))
             if self.distributional == False:
                 return self.output(x)
             else:
@@ -68,12 +64,8 @@ class Q_ConvNet(nn.Module):
                 q = torch.sum(dist * self.support, dim=2)
                 return q
         else:
-            x = F.relu(self.conv(x))
-            advantage = F.relu(self.advantage_fc_hidden(x.view(x.size(0), -1)))
-            value = F.relu(self.value_fc_hidden(x.view(x.size(0), -1)))
-
-            advantage = self.advantage_output(advantage)
-            value = self.value_output(value)
+            advantage = self.advantage_output(x)
+            value = self.value_output(x)
             if self.distributional == False:
                 return value + advantage - advantage.mean(dim=-1, keepdim=True)
             else:
@@ -86,12 +78,9 @@ class Q_ConvNet(nn.Module):
     def reset_noisy(self):
         if self.noisy==True:
             if self.dueling==False:
-                self.fc_hidden.reset_noise()
                 self.output.reset_noise()
             else:
-                self.advantage_fc_hidden.reset_noise()
                 self.advantage_output.reset_noise()
-                self.value_fc_hidden.reset_noise()
                 self.value_output.reset_noise()
 
     def distribution(self, x):
@@ -157,9 +146,9 @@ class NoisyLinear(nn.Module):
 
 
 
-class Ensemble_Q_ConvNet(nn.Module):
+class MultiHead_Q_ConvNet(nn.Module):
     def __init__(self, in_channels, num_actions, ensemble_size):
-        super(Ensemble_Q_ConvNet, self).__init__()
+        super(MultiHead_Q_ConvNet, self).__init__()
         self.in_channels = in_channels
         self.num_actions = num_actions
         self.conv = nn.Conv2d(in_channels, 16, kernel_size=3, stride=1)
@@ -178,6 +167,39 @@ class Ensemble_Q_ConvNet(nn.Module):
     def forward(self, x, head_idx=None):
         x = F.relu(self.conv(x))
         if head_idx==None:
-            head_idx = np.random.randint(self.ensemble_size)
-        x = F.relu(self.ensemble_fc_hiddens[head_idx](x.view(x.size(0), -1)))
-        return self.ensemble_outputs[head_idx](x)
+            q_values = []
+            for head in range(self.ensemble_size):
+                fc_x = F.relu(self.ensemble_fc_hiddens[head](x.view(x.size(0), -1)))
+                q_values.append(self.ensemble_outputs[head](fc_x))
+            return q_values
+        else:
+            fc_x = F.relu(self.ensemble_fc_hiddens[head_idx](x.view(x.size(0), -1)))
+            return self.ensemble_outputs[head_idx](fc_x)
+
+
+class MultiHead_Q_Bone(nn.Module):
+    def __init__(self, in_channels):
+        super(MultiHead_Q_Bone, self).__init__()
+        self.in_channels = in_channels
+        self.conv = nn.Conv2d(in_channels, 16, kernel_size=3, stride=1)
+        def size_linear_unit(size, kernel_size=3, stride=1):
+            return (size - (kernel_size - 1) - 1) // stride + 1
+        num_linear_units = size_linear_unit(10) * size_linear_unit(10) * 16
+        self.fc_hidden = nn.Linear(in_features=num_linear_units, out_features=128)
+
+
+    def forward(self, x):
+        x = F.relu(self.conv(x))
+        x = F.relu(self.fc_hidden(x.view(x.size(0), -1)))
+        return x
+
+
+class MultiHead_Q_Head(nn.Module):
+    def __init__(self, num_actions):
+        super(MultiHead_Q_Head, self).__init__()
+
+        self.output = nn.Linear(in_features=128, out_features=num_actions)
+
+    def forward(self, x):
+        return self.output(x)
+

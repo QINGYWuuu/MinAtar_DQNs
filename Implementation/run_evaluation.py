@@ -26,7 +26,6 @@ parser.add_argument('--noisy', type=str, default='False', help='Noisy DQN')
 class Eval_Agent():
     def __init__(self, args):
         self.args = args
-
         self.seed = args.seed
         random.seed(self.seed)
         np.random.seed(self.seed)
@@ -51,7 +50,14 @@ class Eval_Agent():
         self.obs_dim = self.eval_env.state_shape()[2]
         self.act_dim = self.eval_env.num_actions()
 
-        self.QValue_Net = Q_ConvNet(self.obs_dim, self.act_dim, args.dueling).to(args.device)
+        self.QValue_Net = Q_ConvNet(in_channels=self.obs_dim,
+                            num_actions=self.act_dim,
+                            dueling=args.dueling,
+                            noisy=args.noisy,
+                            distributional=args.distributional,
+                            atom_size=51,
+                            v_min=-10.0,
+                            v_max=10.0).to(args.device)
         self.QValue_Net.eval()
 
 

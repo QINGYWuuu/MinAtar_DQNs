@@ -21,7 +21,7 @@ This project is the pytorch-based implementation of DQN-based methods for MinAta
 14. [x] [Sunrise DQN](https://arxiv.org/pdf/2007.04938.pdf)
 
 ## Implementation Structure
-![DQN_Agent Structrue](pics/structure.png#pic_left)
+![DQN_Agent Structrue](pics/structure.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/10)
     
 
 

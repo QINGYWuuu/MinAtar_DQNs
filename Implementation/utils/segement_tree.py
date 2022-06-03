@@ -140,4 +140,3 @@ class MinSegmentTree(SegmentTree):
     def min(self, start: int = 0, end: int = 0) -> float:
         """Returns min(arr[start], ...,  arr[end])."""
         return super(MinSegmentTree, self).operate(start, end)
-
