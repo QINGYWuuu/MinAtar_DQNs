@@ -1,0 +1,24 @@
+id: UCB_Exploration
+seed: 2
+game: asterix
+use_cuda: True
+batch_size: 32
+memory_capacity: 100000
+target_update: 1000
+T_max: 5000000
+first_n_frames: 100000
+learn_start: 5000
+start_epsilon: 1
+end_epsilon: 0.01
+learning_rate: 0.00025
+grad_momentum: 0.95
+squared_grad_momentum: 0.95
+min_squared_grad: 0.01
+gamma: 0.99
+double: True
+ensemble_size: 5
+Eval: False
+Eval_episode: 30
+device: cpu
+start time: 2022-05-31-06-00-21
+start time: 2022-05-31-23-31-07

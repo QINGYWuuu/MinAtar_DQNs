@@ -26,7 +26,6 @@ parser.add_argument('--noisy', type=str, default='False', help='Noisy DQN')
 class Eval_Agent():
     def __init__(self, args):
         self.args = args
-
         self.seed = args.seed
         random.seed(self.seed)
         np.random.seed(self.seed)

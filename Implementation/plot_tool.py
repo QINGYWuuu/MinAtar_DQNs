@@ -9,9 +9,9 @@ import argparse
 import tqdm
 
 parser = argparse.ArgumentParser(description='MinAtar')
-parser.add_argument('--id', type=str, default='Rainbow', help='Experiment ID')
+parser.add_argument('--id', type=str, default='MultiStepDQN3_var', help='Experiment ID')
 parser.add_argument('--seed', type=int, default=4, help='Random seed')
-parser.add_argument('--game', type=str, default='asterix', help='Game')
+parser.add_argument('--game', type=str, default='breakout', help='Game')
 parser.add_argument('--use-cuda', type=bool, default=True, help='Disable CUDA')
 parser.add_argument('--batch-size', type=int, default=32, metavar='SIZE', help='Batch size')
 parser.add_argument('--memory-capacity', type=int, default=int(1e5), metavar='CAPACITY', help='Experience replay memory capacity')
@@ -26,19 +26,22 @@ parser.add_argument('--grad-momentum', type=float, default=0.95, metavar='η', h
 parser.add_argument('--squared-grad-momentum', type=float, default=0.95, metavar='η', help='Adam')
 parser.add_argument('--min-squared-grad', type=float, default=0.01, metavar='η', help='Adam')
 parser.add_argument('--gamma', type=float, default=0.99, metavar='γ', help='Discount factor')
-parser.add_argument('--dueling', type=bool, default=True, help='Dueling Network Architecture')
-parser.add_argument('--double', type=bool, default=True, help='Double DQN')
+parser.add_argument('--dueling', type=bool, default=False, help='Dueling Network Architecture')
+parser.add_argument('--double', type=bool, default=False, help='Double DQN')
 parser.add_argument('--n-step', type=int, default=3, help='Multi-step DQN')
-parser.add_argument('--distributional', type=bool, default=True, help='Distributional DQN')
-parser.add_argument('--noisy', type=bool, default=True, help='Noisy DQN')
-parser.add_argument('--per', type=bool, default=True, help='Periorized Experience Replay')
+parser.add_argument('--distributional', type=bool, default=False, help='Distributional DQN')
+parser.add_argument('--noisy', type=bool, default=False, help='Noisy DQN')
+parser.add_argument('--per', type=bool, default=False, help='Periorized Experience Replay')
 
-def main():
-    args = parser.parse_args()
+parser.add_argument('--target-way', type=str, default='first', help='the computing method of the target 1) max; 2) avg')
+parser.add_argument('--var-weight', type=bool, default=True, help='Using var as regularization')
+parser.add_argument('--var-t', type=int, default=int(1e3), help='var regularization temperature')
+
+def main(args):
     Steps = []
     Values = []
-    for args.seed in [4]:
-        results_dir = os.path.join('results/alg={}/env={},seed={}/logs'.format(args.id, args.game, args.seed))
+    for args.seed in range(1):
+        results_dir = os.path.join('results/alg={},target={},var_t={}/env={},seed={}/logs'.format(args.id, args.target_way, args.var_t, args.game, args.seed))
         event_data = event_accumulator.EventAccumulator(results_dir)  # a python interface for loading Event data
         event_data.Reload()  # synchronously loads all of the data written so far b
         keys = event_data.scalars.Keys()  # get all tags,save in a list
@@ -51,12 +54,16 @@ def main():
     Steps = np.array(Steps).reshape((-1, 1)).squeeze()
     Values = np.array(Values).reshape((-1, 1)).squeeze()
     sns.lineplot(x=Steps, y=Values, label=args.id)
-    plt.title(keys[0], {'size': 15})
-    plt.show(bbox_inches="tight", pad_inches=0.0)
+
+args = parser.parse_args()
+
+main(args)
 
 
 
-main()
+# plt.title(keys[0], {'size': 15})
+plt.savefig('fig1.png')
+
 
 #
 #
