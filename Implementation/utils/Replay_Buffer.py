@@ -41,6 +41,34 @@ class replay_buffer:
                self.next_states[indices], \
                self.dones[indices])
 
+# retrace replay buffer (s, a, r, s', d)
+class retrace_replay_buffer:
+    def __init__(self, buffer_size):
+        self.buffer_size = buffer_size
+        self.buffer_len = 0 # if len > size, pop the traj in head
+        self.buffer = [] # save trajs, one traj include (states, actions, rewards, dones, behaviour_probs, target_probs)
+
+    def store(self, states, actions, rewards, dones, behaviour_probs, target_probs):
+        while (self.buffer_len > self.buffer_size and len(self.buffer) > 0):
+            traj = self.buffer.pop(0) # remove first traj
+            traj_len = len(traj[0])
+            self.buffer_len -= traj_len
+            
+        self.buffer.append([
+            states,
+            actions,
+            rewards, 
+            dones, 
+            behaviour_probs, 
+            target_probs
+        ])
+        traj_len = len(states)
+        self.buffer_len += traj_len
+
+    def sample(self, batch_size):
+        assert self.buffer_len >= batch_size
+        index = np.random.randint(0, len(self.buffer)) # sample one traj
+        return (self.buffer[index])
 
 class multi_step_replay_buffer:
     def __init__(self, buffer_size, state_dim, args):
