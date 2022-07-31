@@ -49,7 +49,7 @@ class retrace_replay_buffer:
         self.buffer = [] # save trajs, one traj include (states, actions, rewards, dones, behaviour_probs, target_probs)
 
     def store(self, states, actions, rewards, dones, behaviour_probs, target_probs):
-        while (self.buffer_len > self.buffer_size and len(self.buffer) > 0):
+        if (self.buffer_len > self.buffer_size and len(self.buffer) > 0):
             traj = self.buffer.pop(0) # remove first traj
             traj_len = len(traj[0])
             self.buffer_len -= traj_len
